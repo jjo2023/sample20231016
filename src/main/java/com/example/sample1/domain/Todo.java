@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 @Data
 public class Todo {
 private Integer id;
-private String ;
-private LocalDateTime ;
+private String todo;
+private LocalDateTime inserted;
 
 }
 
