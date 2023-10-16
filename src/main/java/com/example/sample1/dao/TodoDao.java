@@ -5,29 +5,51 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 @Component
 public class TodoDao {
-@Autowired
-private DataSource dataSource;
-    public List<Todo> list() throws Exception{
-        String sql = "SELECT * FROM todo ORDER BY id DESC";
-        Collection collection= dataSource.getConnection();
-        Statement statement = collection;
-        ResultSet resultSet = statement.executeQuery(sql);
+ @Autowired
+ private DataSource dataSource;
+ public List<Todo> list() throws Exception{
+     String sql = "SELECT * FROM todo ORDER BY id DESC";
 
-        <Todo> list = new ArrayList<>();
-        (collection;statement;resultSet)
-        while (resultSet.next()) {
+     Connection connection = dataSource.getConnection();
+     Statement statement = connection.createStatement();
+     ResultSet resultSet = statement.executeQuery(sql);
 
-        }
-        return null;
-    }
+     List<Todo> list = new ArrayList<>();
+     try (connection;statement;resultSet){
+         while (resultSet.next()) {
+             Todo todo = new Todo();
+             todo.setId(resultSet.getInt("id"));
+             todo.setTodo(resultSet.getString("todo"));
+             todo.setInserted(resultSet.getTimestamp("inserted").toLocalDateTime());
 
-    public void insert(Todo todo) {
-    }
+             list.add(todo);
+         }
+     }
+     return list;
+ }
+ public boolean insert(Todo todo) throws SQLException{
+     String sql = """
+             INSERT INTO todo(todo)
+             VALUE (?)
+             """;
+     Connection connection = dataSource.getConnection();
+     PreparedStatement statement = connection.prepareStatement(sql);
+     try (connection;statement){
+         statement.setString(1,todo.getTodo());
+         int rows = statement.executeUpdate();
+
+         return rows == 1;
+     }
+ }
+
+
+
+
 }
